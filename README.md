@@ -1,163 +1,112 @@
-# 📚 Leave Management System (Java Swing + MySQL)
+# Leave Management System
 
-A **desktop-based Leave Management System** built using **Java Swing**, **JDBC**, and **MySQL**.  
-Designed for academic institutions to manage student leave requests efficiently with **role-based access** for Students and Admins.
+A Java Swing desktop application for managing student leave requests. Students can register, sign in, submit leave applications, and review their status. Admin/teacher screens support reviewing requests and viewing student leave history.
 
----
+## Features
 
-## 🚀 Features
+- Student registration and login
+- Leave requests with start date, end date, and reason
+- Pending, approved, and rejected request statuses
+- Admin/teacher views for reviewing requests and student history
+- JDBC access to a MySQL database
+- DAO classes for database operations
 
-### 👩‍🎓 Student Module
-- Student signup and login
-- Apply for leave (date range + reason)
-- View leave status (Pending / Approved / Rejected)
-- View leave history and statistics
-- Secure session handling
+## Tech stack
 
-### 👨‍🏫 Admin Module
-- Admin login
-- View all pending leave requests
-- Approve or reject leave requests
-- View registered students (mentees)
-- View approved and rejected leave history
+- Java (use JDK 17 or newer; the source uses Java text blocks)
+- Java Swing
+- MySQL
+- JDBC / MySQL Connector/J
+- Eclipse IDE (recommended)
 
----
+## Project structure
 
-## 🛠️ Tech Stack
+~~~text
+src/
+  Admin/   Admin and teacher screens, request models
+  DB/      Database connection, initializer, and DAO classes
+  Student/ Student screens and leave application flow
+  Utils/   Session utilities
+lib/
+  mysql-connector-j-9.3.0.jar
+~~~
 
-| Layer | Technology |
-|------|------------|
-| Language | Java (JDK 21) |
-| UI | Java Swing |
-| Database | MySQL |
-| Connectivity | JDBC |
-| IDE | Eclipse |
-| Version Control | Git & GitHub |
+## Setup
 
----
+### 1. Install prerequisites
 
-## 📂 Project Structure
+Install JDK 17 or newer, MySQL Server, and Eclipse IDE.
 
-LeaveManagementSystem/
-│
-├── src/
-│ ├── Admin/ # Admin dashboard, login, approval logic
-│ ├── Student/ # Student login, dashboard, leave apply & stats
-│ ├── DB/ # DAO classes, DB connection, DB initializer
-│ ├── Utils/ # Session handling and validations
-│ ├── images/ # UI images and icons
-│ └── main/ # Application entry point
-│
-├── lib/
-│ └── mysql-connector-j-9.3.0.jar
-│
-├── .gitignore
-└── README.md
+### 2. Clone the correct repository
 
-pgsql
-Copy code
+~~~bash
+git clone https://github.com/kVishakhha/leave-management-system.git
+cd leave-management-system
+~~~
 
----
+### 3. Configure MySQL
 
-## 🗄️ Database Schema
+The current Java database configuration connects to a local MySQL server at localhost:3306, uses the database leave_management, and assumes the local MySQL account is root with an empty password. These values are hardcoded in the source, so configure your local MySQL instance accordingly or update **DBConnection.java** and **DatabaseInitializer.java** to use your own local credentials before running the app.
 
-### 👤 Users Table
-```sql
-CREATE TABLE users (
-    id INT PRIMARY KEY,
-    name VARCHAR(100),
-    password VARCHAR(100)
+The initializer defines the following tables:
+
+~~~sql
+CREATE DATABASE IF NOT EXISTS leave_management;
+USE leave_management;
+
+CREATE TABLE IF NOT EXISTS users (
+  id INT PRIMARY KEY,
+  name VARCHAR(100),
+  password VARCHAR(100)
 );
-📄 Leave Requests Table
-sql
-Copy code
-CREATE TABLE leave_requests (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    student_id INT,
-    from_date DATE,
-    to_date DATE,
-    reason TEXT,
-    status VARCHAR(20)
+
+CREATE TABLE IF NOT EXISTS leave_requests (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  student_id INT,
+  from_date DATE,
+  to_date DATE,
+  reason VARCHAR(255),
+  status VARCHAR(20)
 );
-``` 
-### ⚙️ How to Run the Project
-✅ Prerequisites
-Java JDK 17 or above (JDK 21 recommended)
+~~~
 
-MySQL Server
+**Admin login setup:** AdminLogin.java queries an admins table with name and password columns, but DatabaseInitializer.java does not create that table. The admin login will require this schema to be added and an admin account to be configured before that flow can work.
 
-Eclipse IDE
+### 4. Import into Eclipse
 
-MySQL Connector/J
-(Already included in the lib/ folder)
+1. Open Eclipse.
+2. Select **File → Import → General → Existing Projects into Workspace** (or create a Java project and import the source folder if Eclipse does not detect project metadata).
+3. Add the bundled MySQL Connector/J JAR to the build path: right-click the project → **Build Path → Configure Build Path → Libraries → Classpath → Add JARs**, then select **lib/mysql-connector-j-9.3.0.jar**.
+4. Confirm the project resources include the image files referenced under **/images/**.
+5. Ensure MySQL is running and the database tables are created.
+6. Run **src/Admin/MainPage.java** as a Java application.
 
-### ▶️ Steps to Run
-Clone the repository
+If Eclipse does not recognize the source folder automatically, mark **src** as a source folder and ensure the **lib** JAR is on the classpath.
 
-bash
-Copy code
-git clone https://github.com/meetalidangi/leave-management-system.git
-Open Eclipse IDE
+## Application flow
 
-Import the project
+1. Launch the main window.
+2. Select the student or admin/teacher flow.
+3. Sign in or register as a student.
+4. Submit a leave request or review requests from the admin/teacher screens.
+5. Return to the role-selection screen when finished.
 
-mathematica
-Copy code
-File → Import → Existing Projects into Workspace
-Add MySQL Connector to Build Path
+## Security and limitations
 
-sql
-Copy code
-Right click project → Build Path → Add External JARs
-→ Select lib/mysql-connector-j-9.3.0.jar
-Start MySQL Server
+This repository is an academic prototype and should not be used with real student records without security improvements.
 
-Run the application
+- **Plaintext passwords:** Current student and admin login queries compare stored passwords directly. Passwords are not hashed. Add a password-hashing mechanism and migrate existing records before real use.
+- **Hardcoded database credentials:** Database username/password and connection settings are embedded in Java source. Move configuration to environment variables or a local configuration file that is excluded from version control.
+- **Database transport:** The JDBC URL sets useSSL=false. Use TLS with certificate verification for remote or production databases.
+- **Authorization:** Review and test role checks and session handling before using sensitive records.
+- **Validation and testing:** Validate date ranges and inputs, and add automated tests for login, request creation, and approval/rejection workflows.
 
-java
-Copy code
-Admin.MainPage
-### 🔐 Application Flow
-Launch the application
+The repository currently has no committed automated test suite or standard build file (such as Maven/Gradle). Run and verify the application manually in the configured local environment.
 
-Select role (Student / Admin)
+## Contributors
 
-Login or Signup
+- Meetali Dangi
+- Vishakha Khetan
 
-Perform role-based actions
-
-Logout redirects back to role selection page
-
-### 📌 Scalability & Design
-Implements DAO (Data Access Object) pattern
-
-JDBC-based database abstraction
-
-Modular and clean architecture
-
-Easily extendable to:
-
-Spring Boot backend
-
-REST / Web-based application
-
-Cloud-hosted databases (AWS RDS, Azure SQL)
-
-### 🤝 Contributors
-Meetali Dangi
-
-Vishakha Khetan
-
-### 📜 License
-This project is developed for educational and academic purposes.
-
-### 🚀 Future Enhancements
-Password hashing & encryption
-
-Role-based authorization
-
-Email notifications
-
-Attendance management integration
-
-Web version using Spring Boot
+---
+Created for educational use.
