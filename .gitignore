@@ -1,20 +1,12 @@
-# Java build output
-*.class
+# Eclipse / Java
 bin/
-out/
-target/
-
-# Eclipse / IDE metadata
 .settings/
 .classpath
 .project
-.idea/
-.vscode/
 
-# Local configuration and logs
-*.properties.local
-*.log
-
-# Operating system files
-.DS_Store
+# OS files
 Thumbs.db
+.DS_Store
+
+# Logs
+*.log
